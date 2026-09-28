@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Squad Server Setup</title>
+<style>
+:root{--bg:#f4efe6;--panel:#fffaf1;--ink:#231d15;--mute:#6b604f;--rule:#d9ccb6;--accent:#0f7c76;--gold:#9a6a12;--code:#efe5d3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14120f;--panel:#1d1a16;--ink:#ece4d6;--mute:#a89c88;--rule:#3a342b;--accent:#4fc7bd;--gold:#e0b35a;--code:#2a251f}}
+:root[data-theme="dark"]{--bg:#14120f;--panel:#1d1a16;--ink:#ece4d6;--mute:#a89c88;--rule:#3a342b;--accent:#4fc7bd;--gold:#e0b35a;--code:#2a251f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:820px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 12px;letter-spacing:-.01em}
+h2{font-size:1.3rem;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--rule)}
+h3{font-size:1.05rem;margin:26px 0 8px;color:var(--accent)}
+p,li{max-width:70ch} ul,ol{padding-left:1.4em} li{margin:4px 0}
+a{color:var(--accent)} strong{color:var(--ink)}
+code{font:0.88em ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--code);padding:1px 5px;border-radius:4px;word-break:break-word}
+.tw{overflow-x:auto;margin:10px 0 16px;border:1px solid var(--rule);border-radius:8px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--rule)}
+th{color:var(--mute);font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+h1+p{font-size:1.06rem}
+</style></head><body><main>
+<h1>Capsid Wasteland: online squad server (v21)</h1>
+<p>This folder is the game's online home. One free web service on Render does three things:</p>
+<ul>
+<li><strong>Serves the game.</strong> Everyone opens one web address to play. No file to pass around, and everyone always has the same version.</li>
+<li><strong>Connects squads.</strong> Invite codes and invite links work from anywhere.</li>
+<li><strong>Relays game traffic</strong> when two players can't connect to each other directly (school, work or mobile networks).</li>
+</ul>
+<p>Only the person who sets it up needs accounts: GitHub and Render, both free. It takes about 10 minutes, once.</p>
+<p><strong>In this folder:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capsid_wasteland_v21.html</code></td>
+<td>The game. The server always serves the highest <code>vNN</code> it finds.</td>
+</tr>
+<tr>
+<td><code>relay_server.js</code></td>
+<td>The squad server: one file, no dependencies, Node 18+.</td>
+</tr>
+<tr>
+<td><code>package.json</code></td>
+<td>Tells Render this is a Node app.</td>
+</tr>
+<tr>
+<td><code>render.yaml</code></td>
+<td>The Render Blueprint: every setting filled in for you.</td>
+</tr>
+<tr>
+<td><code>Dockerfile</code></td>
+<td>For container hosts other than Render (optional).</td>
+</tr>
+<tr>
+<td><code>extras/</code></td>
+<td>Files for running it on your own server (optional).</td>
+</tr>
+<tr>
+<td><code>README.md</code>, <code>setup_guide.html</code></td>
+<td>This guide.</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Already set up with an earlier package?</h2>
+<p>Update in two uploads. You don't need to touch Render.</p>
+<ol>
+<li>In your GitHub repository, click <strong>Add file → Upload files</strong>. Drop in <code>relay_server.js</code> and <code>capsid_wasteland_v21.html</code> from this folder, then click <strong>Commit changes</strong>. The new <code>relay_server.js</code> replaces the old one.</li>
+<li>Optional: delete the old <code>capsid_wasteland_vNN.html</code> files (open one, then <strong>⋯ → Delete file</strong>). The server ignores them anyway.</li>
+</ol>
+<p>Render redeploys by itself within a couple of minutes. Open your address, then <strong>⚙ → Test</strong>: it should say <strong>serves v21</strong>.</p>
+<h2>First-time setup (free, on Render)</h2>
+<h3>1. Put this folder on GitHub</h3>
+<ol>
+<li>Sign in at <strong>github.com</strong>. Click <strong>+</strong> (top right) → <strong>New repository</strong>.</li>
+<li>Name it <code>capsid-squad</code>. Choose <strong>Public</strong> or <strong>Private</strong> (both work), then click <strong>Create repository</strong>.</li>
+<li>On the empty repository page, click <strong>uploading an existing file</strong>.</li>
+<li>Select <strong>everything inside this folder</strong> (not the folder itself) and drag it onto the page. That includes <code>extras</code> and the hidden <code>.dockerignore</code>; if those two don't come along, that's fine.</li>
+<li>Click <strong>Commit changes</strong>.</li>
+</ol>
+<h3>2. Create the service on Render</h3>
+<ol>
+<li>Go to <strong>render.com</strong> → <strong>Get Started</strong> and sign up with <strong>GitHub</strong>. When asked, give Render access to the <code>capsid-squad</code> repository (or to all repositories).</li>
+<li>In the Render dashboard, click <strong>New</strong> (top right) → <strong>Blueprint</strong>.</li>
+<li>Pick <code>capsid-squad</code>. Render reads <code>render.yaml</code> and shows one free web service called <strong>capsid-squad</strong>. Click <strong>Deploy Blueprint</strong> (or <strong>Apply</strong>).</li>
+<li>Open the service. When the status says <strong>Live</strong> (1–3 minutes), its address is at the top, something like <code>https://capsid-squad-ab12.onrender.com</code>.</li>
+</ol>
+<p>No Blueprint option? Use <strong>New → Web Service</strong>, pick the repository, and set:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language / Runtime</td>
+<td>Node</td>
+</tr>
+<tr>
+<td>Build command</td>
+<td><code>echo ok</code></td>
+</tr>
+<tr>
+<td>Start command</td>
+<td><code>node relay_server.js</code></td>
+</tr>
+<tr>
+<td>Instance type</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Health check path (Advanced)</td>
+<td><code>/health</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3>3. Check it</h3>
+<ul>
+<li><code>https://&lt;your address&gt;/health</code> should show <code>ok 0</code> (the number is players connected).</li>
+<li><code>https://&lt;your address&gt;/info</code> should show <code>"gameVersion":"v21"</code>.</li>
+</ul>
+<h3>4. Play</h3>
+<ol>
+<li>Open your Render address. The game loads, and the front screen says <strong>Connection: squad server …</strong>.</li>
+<li>Click <strong>Create Private Squad</strong>, then <strong>Copy invite link</strong> in the lobby, and send the link to your friends. It opens the game with the code already filled in.</li>
+<li>Friends pick a squad member and a name, then press <strong>Join Squad</strong>.</li>
+</ol>
+<p>Anyone who plays from a downloaded game file can still use the server: <strong>⚙ → Private server</strong>, paste your address (<code>https://…</code> works), then press <strong>Test</strong> and <strong>Save</strong>. Their file must be the same version as the one the server serves.</p>
+<h2>Updating the game later</h2>
+<ol>
+<li>Upload the new <code>capsid_wasteland_vNN.html</code> to the repository (<strong>Add file → Upload files</strong>). If a new <code>relay_server.js</code> comes with it, upload that too.</li>
+<li>Render redeploys automatically. Update between play sessions: a redeploy restarts the server, which ends squads that are playing.</li>
+<li>Everyone just reloads your address.</li>
+</ol>
+<h2>The free plan</h2>
+<ul>
+<li><strong>It sleeps when nobody plays.</strong> After 15 minutes with no visits and no game traffic, the server goes to sleep. The next visitor waits about a minute (Render shows a loading page), and players from a file see "Waking up the squad server… N s". While anyone is connected, even in the lobby, the game's heartbeats keep it awake.</li>
+<li><strong>Hours:</strong> 750 free instance hours a month per workspace. That's enough for this one service all month, so don't run other free services in the same workspace.</li>
+<li><strong>Always awake:</strong> a paid instance never sleeps. Change <strong>Instance type</strong> in the service's settings.</li>
+<li><strong>Download size:</strong> the server sends the game compressed, about 3.5 MB instead of 5.4 MB.</li>
+</ul>
+<h2>Settings (optional)</h2>
+<p>In Render, open the service, then <strong>Environment → Add environment variable</strong>. Saving restarts the server.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>What it does</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KEY</code></td>
+<td>A password for the server. Players type it in <strong>⚙ → Key</strong></td>
+<td>not set</td>
+</tr>
+<tr>
+<td><code>MAX_PLAYERS</code></td>
+<td>Most players connected at once, across all squads</td>
+<td>300</td>
+</tr>
+<tr>
+<td><code>PER_IP</code></td>
+<td>Most connections from one home network</td>
+<td>12</td>
+</tr>
+<tr>
+<td><code>GAME_FILE</code></td>
+<td>Serve a specific file instead of the newest <code>capsid_wasteland_vNN.html</code></td>
+<td>newest</td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td>The port. Render sets this for you</td>
+<td>8787</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Troubleshooting</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>You see</th>
+<th>Do this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The page takes about a minute to load</td>
+<td>The server was asleep. That's normal on the free plan.</td>
+</tr>
+<tr>
+<td>Render deploy fails</td>
+<td>Open <strong>Logs</strong>. Check that <code>relay_server.js</code> and <code>package.json</code> are at the top of the repository, not inside a subfolder.</td>
+</tr>
+<tr>
+<td><code>/info</code> shows an old <code>gameVersion</code></td>
+<td>The new html wasn't uploaded, or its name doesn't end in <code>_vNN.html</code>.</td>
+</tr>
+<tr>
+<td>"Different game version" when joining</td>
+<td>Everyone should open your address rather than an old file.</td>
+</tr>
+<tr>
+<td>"This squad server needs a key"</td>
+<td><code>KEY</code> is set: share it, or delete the variable.</td>
+</tr>
+<tr>
+<td><strong>⚙ → Test</strong> says no server answered</td>
+<td>Check the address, and that the service is <strong>Live</strong> in Render.</td>
+</tr>
+<tr>
+<td>Anything else</td>
+<td><strong>Connection log</strong> (in the lobby or ⚙) → <strong>Copy debug log</strong>, and send it along.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Render's <strong>Logs</strong> tab shows <code>+ id</code> when someone connects, <code>- id</code> when they leave, and a line when the game file is compressed.</p>
+<h2>Other hosts</h2>
+<p>The server is a single Node file with no dependencies, so any host that runs Node or Docker works:</p>
+<ul>
+<li><strong>Railway:</strong> New Project → Deploy from GitHub repo, then Settings → Networking → Generate Domain. It gives a small monthly credit, then it's paid.</li>
+<li><strong>Fly.io:</strong> run <code>fly launch</code> in this folder (it uses the <code>Dockerfile</code>, port 8787). Paid, a few dollars a month.</li>
+<li><strong>Your own Linux server:</strong> install Node 18+, copy the folder to <code>/opt/capsid-squad</code>, and use <code>extras/capsid-squad.service</code> (systemd). Put <code>extras/Caddyfile</code> in front of it for HTTPS on your own domain.</li>
+</ul>
+<p>Static-only hosts (GitHub Pages, Netlify) can't run the squad server.</p>
+<h2>What the server stores</h2>
+<p>Nothing. There are no accounts and no saved games. It only knows who is connected right now, by random ids, and its logs show those ids with times. Invite codes are 6 random characters, and a squad is gone when its host leaves.</p>
+</main></body></html>

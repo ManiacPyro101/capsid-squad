@@ -1,0 +1,5 @@
+# Own server (VPS) with a domain name: Caddy gets the HTTPS certificate and passes WebSockets through by itself.
+# Point your domain's DNS (an A record) at the server, replace the name below, then: sudo systemctl reload caddy
+play.example.com {
+	reverse_proxy 127.0.0.1:8787
+}

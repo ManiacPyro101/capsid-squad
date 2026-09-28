@@ -1,0 +1,17 @@
+# systemd service: keeps the squad server running and restarts it after crashes or reboots.
+# 1) copy the folder to /opt/capsid-squad   2) sudo cp capsid-squad.service /etc/systemd/system/
+# 3) sudo systemctl enable --now capsid-squad     logs: journalctl -u capsid-squad -f
+[Unit]
+Description=Capsid Wasteland squad server
+After=network-online.target
+
+[Service]
+WorkingDirectory=/opt/capsid-squad
+ExecStart=/usr/bin/node relay_server.js
+Environment=PORT=8787
+Restart=always
+RestartSec=3
+DynamicUser=yes
+
+[Install]
+WantedBy=multi-user.target

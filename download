@@ -1,0 +1,5 @@
+.git
+*.zip
+extras
+README.md
+setup_guide.html
