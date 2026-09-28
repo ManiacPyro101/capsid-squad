@@ -17,7 +17,7 @@
 //   GAME_FILE     serve this file instead of the newest capsid_wasteland_vNN.html
 'use strict';
 const http = require('http'), crypto = require('crypto'), fs = require('fs'), path = require('path'), os = require('os'), zlib = require('zlib');
-const SERVER_VERSION = 21;
+const SERVER_VERSION = 22;
 const PORT = +process.env.PORT || 8787, KEY = process.env.KEY || 'peerjs';
 const MAX_PLAYERS = +process.env.MAX_PLAYERS || 300, PER_IP = +process.env.PER_IP || 12, STARTED = Date.now();
 const perIp = new Map();                 // address -> open sockets
@@ -46,15 +46,23 @@ const server = http.createServer((req, res) => {
       res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-cache'); res.setHeader('ETag', tag);
       if (req.headers['if-none-match'] === tag){res.statusCode = 304; res.end(); return;}
       res.setHeader('Vary', 'Accept-Encoding');
+      const pg = pageOf(f, tag); if (!pg){res.statusCode = 500; res.end('Could not read the game file'); return;}
       // the page is ~5 MB of mostly text: send it gzipped (compressed once, then cached until the file changes)
-      if (/\bgzip\b/.test(req.headers['accept-encoding'] || '')){const gz = gzipOf(f, tag);
-        if (gz){res.setHeader('Content-Encoding', 'gzip'); res.setHeader('Content-Length', gz.length); res.end(req.method === 'HEAD' ? undefined : gz); return;}}
-      res.setHeader('Content-Length', st.size); if (req.method === 'HEAD'){res.end(); return;} fs.createReadStream(f).pipe(res); return;}}
+      const gz = /\bgzip\b/.test(req.headers['accept-encoding'] || ''), body = gz ? pg.gz : pg.plain;
+      if (gz) res.setHeader('Content-Encoding', 'gzip');
+      res.setHeader('Content-Length', body.length); res.end(req.method === 'HEAD' ? undefined : body); return;}}
   res.setHeader('Content-Type', 'text/plain'); res.end('Capsid Wasteland squad server is running. ' + clients.size + ' connected.');
 });
 
-let GZ = {tag: '', buf: null};
-function gzipOf(f, tag){if (GZ.tag !== tag){try {GZ = {tag, buf: zlib.gzipSync(fs.readFileSync(f), {level: 9})}; log('compressed ' + path.basename(f) + ': ' + (fs.statSync(f).size/1e6).toFixed(1) + ' MB -> ' + (GZ.buf.length/1e6).toFixed(1) + ' MB');} catch (e){GZ = {tag: '', buf: null};}} return GZ.buf;}
+// the page as served: stamped with <meta name="capsid-squad-server"> so the game knows for certain to use this server,
+// then gzipped. Built once per game-file change.
+let PAGE = {tag: '', plain: null, gz: null};
+function pageOf(f, tag){if (PAGE.tag !== tag){try {let html = fs.readFileSync(f, 'utf8');
+      const stamp = '<meta name="capsid-squad-server" content="' + SERVER_VERSION + '">', i = html.search(/<head[^>]*>/i);
+      html = i >= 0 ? html.replace(/<head[^>]*>/i, m => m + stamp) : stamp + html;
+      const plain = Buffer.from(html, 'utf8'); PAGE = {tag, plain, gz: zlib.gzipSync(plain, {level: 9})};
+      log('prepared ' + path.basename(f) + ': ' + (plain.length/1e6).toFixed(1) + ' MB, ' + (PAGE.gz.length/1e6).toFixed(1) + ' MB gzipped');}
+    catch (e){log('could not read ' + f + ': ' + e.message); PAGE = {tag: '', plain: null, gz: null};}} return PAGE.plain ? PAGE : null;}
 
 // ------------------------------------------------------------------ a tiny RFC 6455 WebSocket implementation
 server.on('upgrade', (req, sock) => {

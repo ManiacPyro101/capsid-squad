@@ -21,7 +21,7 @@ th{color:var(--mute);font-weight:600;font-size:.82rem;text-transform:uppercase;l
 tr:last-child td{border-bottom:0}
 h1+p{font-size:1.06rem}
 </style></head><body><main>
-<h1>Capsid Wasteland: online squad server (v21)</h1>
+<h1>Capsid Wasteland: online squad server (v22)</h1>
 <p>This folder is the game's online home. One free web service on Render does three things:</p>
 <ul>
 <li><strong>Serves the game.</strong> Everyone opens one web address to play. No file to pass around, and everyone always has the same version.</li>
@@ -39,7 +39,7 @@ h1+p{font-size:1.06rem}
 </thead>
 <tbody>
 <tr>
-<td><code>capsid_wasteland_v21.html</code></td>
+<td><code>capsid_wasteland_v22.html</code></td>
 <td>The game. The server always serves the highest <code>vNN</code> it finds.</td>
 </tr>
 <tr>
@@ -71,10 +71,10 @@ h1+p{font-size:1.06rem}
 <h2>Already set up with an earlier package?</h2>
 <p>Update in two uploads. You don't need to touch Render.</p>
 <ol>
-<li>In your GitHub repository, click <strong>Add file → Upload files</strong>. Drop in <code>relay_server.js</code> and <code>capsid_wasteland_v21.html</code> from this folder, then click <strong>Commit changes</strong>. The new <code>relay_server.js</code> replaces the old one.</li>
+<li>In your GitHub repository, click <strong>Add file → Upload files</strong>. Drop in <code>relay_server.js</code> and <code>capsid_wasteland_v22.html</code> from this folder, then click <strong>Commit changes</strong>. The new <code>relay_server.js</code> replaces the old one.</li>
 <li>Optional: delete the old <code>capsid_wasteland_vNN.html</code> files (open one, then <strong>⋯ → Delete file</strong>). The server ignores them anyway.</li>
 </ol>
-<p>Render redeploys by itself within a couple of minutes. Open your address, then <strong>⚙ → Test</strong>: it should say <strong>serves v21</strong>.</p>
+<p>Render redeploys by itself within a couple of minutes. Open your address, then <strong>⚙ → Test</strong>: it should say <strong>serves v22</strong>.</p>
 <h2>First-time setup (free, on Render)</h2>
 <h3>1. Put this folder on GitHub</h3>
 <ol>
@@ -125,7 +125,7 @@ h1+p{font-size:1.06rem}
 <h3>3. Check it</h3>
 <ul>
 <li><code>https://&lt;your address&gt;/health</code> should show <code>ok 0</code> (the number is players connected).</li>
-<li><code>https://&lt;your address&gt;/info</code> should show <code>"gameVersion":"v21"</code>.</li>
+<li><code>https://&lt;your address&gt;/info</code> should show <code>"gameVersion":"v22"</code>.</li>
 </ul>
 <h3>4. Play</h3>
 <ol>
@@ -205,6 +205,10 @@ h1+p{font-size:1.06rem}
 <tr>
 <td><code>/info</code> shows an old <code>gameVersion</code></td>
 <td>The new html wasn't uploaded, or its name doesn't end in <code>_vNN.html</code>.</td>
+</tr>
+<tr>
+<td>"No squad found" although the host has the lobby open</td>
+<td>Everyone should play from your Render address and join with the invite link. From v22 on, the game also checks the other server by itself before giving up.</td>
 </tr>
 <tr>
 <td>"Different game version" when joining</td>

@@ -1,4 +1,4 @@
-# Capsid Wasteland: online squad server (v21)
+# Capsid Wasteland: online squad server (v22)
 
 This folder is the game's online home. One free web service on Render does three things:
 
@@ -12,7 +12,7 @@ Only the person who sets it up needs accounts: GitHub and Render, both free. It 
 
 | File | What it is |
 |---|---|
-| `capsid_wasteland_v21.html` | The game. The server always serves the highest `vNN` it finds. |
+| `capsid_wasteland_v22.html` | The game. The server always serves the highest `vNN` it finds. |
 | `relay_server.js` | The squad server: one file, no dependencies, Node 18+. |
 | `package.json` | Tells Render this is a Node app. |
 | `render.yaml` | The Render Blueprint: every setting filled in for you. |
@@ -24,10 +24,10 @@ Only the person who sets it up needs accounts: GitHub and Render, both free. It 
 
 Update in two uploads. You don't need to touch Render.
 
-1. In your GitHub repository, click **Add file → Upload files**. Drop in `relay_server.js` and `capsid_wasteland_v21.html` from this folder, then click **Commit changes**. The new `relay_server.js` replaces the old one.
+1. In your GitHub repository, click **Add file → Upload files**. Drop in `relay_server.js` and `capsid_wasteland_v22.html` from this folder, then click **Commit changes**. The new `relay_server.js` replaces the old one.
 2. Optional: delete the old `capsid_wasteland_vNN.html` files (open one, then **⋯ → Delete file**). The server ignores them anyway.
 
-Render redeploys by itself within a couple of minutes. Open your address, then **⚙ → Test**: it should say **serves v21**.
+Render redeploys by itself within a couple of minutes. Open your address, then **⚙ → Test**: it should say **serves v22**.
 
 ## First-time setup (free, on Render)
 
@@ -59,7 +59,7 @@ No Blueprint option? Use **New → Web Service**, pick the repository, and set:
 ### 3. Check it
 
 - `https://<your address>/health` should show `ok 0` (the number is players connected).
-- `https://<your address>/info` should show `"gameVersion":"v21"`.
+- `https://<your address>/info` should show `"gameVersion":"v22"`.
 
 ### 4. Play
 
@@ -101,6 +101,7 @@ In Render, open the service, then **Environment → Add environment variable**. 
 | The page takes about a minute to load | The server was asleep. That's normal on the free plan. |
 | Render deploy fails | Open **Logs**. Check that `relay_server.js` and `package.json` are at the top of the repository, not inside a subfolder. |
 | `/info` shows an old `gameVersion` | The new html wasn't uploaded, or its name doesn't end in `_vNN.html`. |
+| "No squad found" although the host has the lobby open | Everyone should play from your Render address and join with the invite link. From v22 on, the game also checks the other server by itself before giving up. |
 | "Different game version" when joining | Everyone should open your address rather than an old file. |
 | "This squad server needs a key" | `KEY` is set: share it, or delete the variable. |
 | **⚙ → Test** says no server answered | Check the address, and that the service is **Live** in Render. |
