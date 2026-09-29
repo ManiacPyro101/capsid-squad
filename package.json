@@ -1,6 +1,6 @@
 {
   "name": "capsid-squad-server",
-  "version": "22.0.0",
+  "version": "24.0.0",
   "private": true,
   "description": "Capsid Wasteland squad server: serves the game and connects squads (no dependencies).",
   "main": "relay_server.js",
