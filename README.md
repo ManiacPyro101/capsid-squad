@@ -1,4 +1,4 @@
-# Capsid Wasteland: online squad server (v36)
+# Capsid Wasteland: online squad server (v46)
 
 This folder is the game's online home. One free web service on Render does three things:
 
@@ -12,7 +12,7 @@ Only the person who sets it up needs accounts: GitHub and Render, both free. It 
 
 | File | What it is |
 |---|---|
-| `capsid_wasteland_v36.html` | The game. The server always serves the highest `vNN` it finds. |
+| `capsid_wasteland_v46.html` | The game. The server always serves the highest `vNN` it finds. |
 | `relay_server.js` | The squad server: one file, no dependencies, Node 18+. |
 | `package.json` | Tells Render this is a Node app. |
 | `render.yaml` | The Render Blueprint: every setting filled in for you. |
@@ -24,10 +24,10 @@ Only the person who sets it up needs accounts: GitHub and Render, both free. It 
 
 Update in two uploads. You don't need to touch Render.
 
-1. In your GitHub repository, click **Add file → Upload files**. Drop in `relay_server.js` and `capsid_wasteland_v36.html` from this folder, then click **Commit changes**. The new `relay_server.js` replaces the old one.
+1. In your GitHub repository, click **Add file → Upload files**. Drop in `relay_server.js` and `capsid_wasteland_v46.html` from this folder, then click **Commit changes**. The new `relay_server.js` replaces the old one.
 2. Optional: delete the old `capsid_wasteland_vNN.html` files (open one, then **⋯ → Delete file**). The server ignores them anyway.
 
-Render redeploys by itself within a couple of minutes. Open your address, then **⚙ → Test**: it should say **serves v36**.
+Render redeploys by itself within a couple of minutes. Open your address, then **⚙ → Test**: it should say **serves v46**.
 
 ## First-time setup (free, on Render)
 
@@ -59,7 +59,7 @@ No Blueprint option? Use **New → Web Service**, pick the repository, and set:
 ### 3. Check it
 
 - `https://<your address>/health` should show `ok 0` (the number is players connected).
-- `https://<your address>/info` should show `"gameVersion":"v36"`.
+- `https://<your address>/info` should show `"gameVersion":"v46"`.
 
 ### 4. Play
 
